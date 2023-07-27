@@ -64,7 +64,7 @@ const userSchema = new mongoose.Schema(
     courseProgress: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "courseProgress",
+        ref: "CourseProgress",
       },
     ],
 
@@ -74,4 +74,4 @@ const userSchema = new mongoose.Schema(
 )
 
 // Export the Mongoose model for the user schema, using the name "user"
-module.exports = mongoose.model("user", userSchema)
+module.exports = mongoose.model("User", userSchema)
