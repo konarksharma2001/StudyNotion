@@ -16,6 +16,11 @@ export const profileEndpoints = {
   GET_INSTRUCTOR_DATA_API: BASE_URL + "/profile/instructorDashboard",
 }
 
+// CHAT ENDPOINTS
+export const chatEndpoints = {
+  GET_All_MESSAGES_API: "http://localhost:4000/getAllMessages",
+}
+
 // STUDENTS ENDPOINTS
 export const studentEndpoints = {
   COURSE_PAYMENT_API: BASE_URL + "/payment/capturePayment",

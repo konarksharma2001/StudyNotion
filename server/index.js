@@ -12,6 +12,8 @@ const cors = require("cors");
 const { cloudinaryConnect } = require("./config/cloudinary");
 const fileUpload = require("express-fileupload");
 const dotenv = require("dotenv");
+const Message = require("./models/ChatMessage");
+const messageRoutes = require("./routes/Chat");
 
 // Setting up port number
 const PORT = process.env.PORT || 4000;
@@ -47,6 +49,7 @@ app.use("/api/v1/profile", profileRoutes);
 app.use("/api/v1/course", courseRoutes);
 app.use("/api/v1/payment", paymentRoutes);
 app.use("/api/v1/reach", contactUsRoute);
+app.use("/", messageRoutes);
 
 // Testing the server
 app.get("/", (req, res) => {
@@ -61,4 +64,50 @@ app.listen(PORT, () => {
 	console.log(`App is listening at ${PORT}`);
 });
 
-// End of code.
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({ port: 8080 }); // Use port 8080 for WebSocket server
+
+wss.on('connection', ws => {
+    console.log('Client connected');
+
+    ws.on('message', async message => {
+        const data = JSON.parse(message);
+        console.log(`Received: ${data.payload} from client ${data.clientId}`);
+
+        // Save the received message to the database using the Message model
+        try {
+            const newMessage = new Message({
+                message: data.payload,
+                user: {
+                    id: data.clientId,
+                    firstName: data.firstName, // Include sender's first name
+                    lastName: data.lastName, // Include sender's last name
+                },
+				createdAt: new Date(),
+            });
+            await newMessage.save();
+            console.log("Message saved to database:", newMessage);
+        } catch (error) {
+            console.error("Error saving message to database:", error);
+        }
+
+        // Broadcast the message to all connected clients
+        const messageToSend = JSON.stringify({
+            id: data.clientId, // Ensure id property is included
+            message: data.payload,
+            firstName: data.firstName,
+            lastName: data.lastName,
+			createdAt: new Date(),
+        });
+        wss.clients.forEach(client => {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(messageToSend);
+            }
+        });
+    });
+
+    ws.on('close', () => {
+        console.log('Client disconnected');
+    });
+});
+
