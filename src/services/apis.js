@@ -18,7 +18,7 @@ export const profileEndpoints = {
 
 // CHAT ENDPOINTS
 export const chatEndpoints = {
-  GET_All_MESSAGES_API: "http://localhost:4000/getAllMessages",
+  GET_All_MESSAGES_API: "https://studynotion-backend-jtcl.onrender.com/getAllMessages",
 }
 
 // STUDENTS ENDPOINTS
